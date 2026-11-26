@@ -24,13 +24,22 @@ Your phone shrinks each photo to 2560 px on the long side (about 1 MB) before up
 
 ## 2. Set up Cloudinary
 
-1. Sign up at cloudinary.com (free plan).
-2. On the dashboard, copy your **Cloud name**.
-3. Go to **Settings (gear) → Upload → Upload presets → Add upload preset**:
-   - **Signing mode:** Unsigned
-   - **Asset folder** (or **Folder**): `photo365`
-   - Optional but recommended: under limits, set allowed formats to `jpg,png,heic,webp` and a max file size of 20 MB.
-   - Save, then copy the **preset name** (it looks like `ab12cd34`). Treat it like a password: it isn't published on your site, it's only stored on your phone.
+Cloudinary changes its screens often, so the names below may differ slightly. You need just two things from it: your **cloud name** and an **unsigned upload preset**.
+
+1. Sign up at cloudinary.com (free plan). If it asks what you're building, any answer is fine.
+2. **Cloud name:** it's shown on the console's home/dashboard page, and also under **Settings → API Keys** at the top of the page. It's a short word like `dxyz12abc`. (You don't need the API key or secret.)
+3. **Upload preset:** while signed in, go straight to
+   `https://console.cloudinary.com/app/settings/upload/presets`
+   (or **Settings**, the gear at the bottom left, then **Upload Presets**). Click **Add Upload Preset**.
+4. On the **General** tab:
+   - **Signing mode:** Unsigned. This is the only setting that really matters.
+   - **Upload preset name:** leave the generated one or type something hard to guess, like `p365-` plus a few random letters.
+   - **Asset folder** (some accounts call it **Folder**): `photo365`. Optional.
+   - Leave everything else as it is.
+5. Optional: on the **Optimize and Deliver** tab, set **Allowed formats** to `jpg,png,heic,webp`.
+6. Click **Save**. The preset now appears in the list with its name and "Unsigned".
+
+Treat the preset name like a password. It isn't published on your site; it's only stored on your phone.
 
 ## 3. Create a GitHub token for uploading
 

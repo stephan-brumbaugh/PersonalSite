@@ -173,20 +173,33 @@
   function setStatus(msg, kind) { var s = $('status'); s.textContent = msg; s.className = 'status' + (kind ? ' ' + kind : ''); }
   function setBar(p) { var b = $('bar'); b.style.display = p == null ? 'none' : 'block'; b.firstElementChild.style.width = (p || 0) + '%'; }
 
+  // Tries with a dated file name first; if the preset's settings reject that,
+  // retries with only the photo and the preset so any preset setup works.
   function upload(blob, k) {
+    return uploadOnce(blob, k, true).catch(function (e) {
+      if (e.status === 400) return uploadOnce(blob, k, false);
+      throw e;
+    });
+  }
+  function uploadOnce(blob, k, extras) {
     return new Promise(function (res, rej) {
       var fd = new FormData();
       fd.append('file', blob, k + '.jpg');
       fd.append('upload_preset', S.preset);
-      fd.append('public_id', k + '-' + Math.random().toString(36).slice(2, 8));
-      fd.append('tags', 'photo365');
+      if (extras) {
+        fd.append('public_id', k + '-' + Math.random().toString(36).slice(2, 8));
+        fd.append('tags', 'photo365');
+      }
       var x = new XMLHttpRequest();
       x.open('POST', 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(S.cloudName) + '/image/upload');
       x.upload.onprogress = function (e) { if (e.lengthComputable) setBar(5 + e.loaded / e.total * 80); };
       x.onload = function () {
         var j = {}; try { j = JSON.parse(x.responseText); } catch (e) {}
         if (x.status >= 200 && x.status < 300 && j.public_id) res(j);
-        else rej(new Error('Photo upload failed: ' + ((j.error && j.error.message) || x.status)));
+        else {
+          var err = new Error('Photo upload failed: ' + ((j.error && j.error.message) || x.status));
+          err.status = x.status; rej(err);
+        }
       };
       x.onerror = function () { rej(new Error('Photo upload failed. Check your connection.')); };
       x.send(fd);
