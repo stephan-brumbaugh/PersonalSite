@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Stephan</title>
+  <meta name="description" content="Stephan's personal site: interests, resume, and a photo-a-day project.">
+  <meta name="theme-color" content="#0d0d0e">
+  <link rel="icon" href="photo365/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+  <style>
+    .hero { padding-top: 72px; padding-bottom: 56px; }
+    .hero p.lead { font-size: clamp(1.1rem, 2.4vw, 1.3rem); color: var(--muted); max-width: 46ch; }
+    .hero .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+    .strip { display: grid; gap: 6px; grid-template-columns: repeat(3, 1fr); margin: 24px 0; }
+    @media (min-width: 720px) { .strip { grid-template-columns: repeat(6, 1fr); } }
+    .strip a { aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: var(--surface); }
+    .strip img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+    .strip a:hover img { transform: scale(1.04); }
+    .split { display: grid; gap: 32px; }
+    @media (min-width: 860px) { .split { grid-template-columns: 1fr 1.4fr; align-items: start; } }
+    .card .icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .links { display: flex; gap: 10px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Stephan</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./" aria-current="page">Home</a>
+        <a href="photo365/">Photo365</a>
+        <a href="resume.html">Resume</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow">Hi, I'm</p>
+      <h1>Stephan</h1>
+      <!-- EDIT: replace this sentence with your own intro -->
+      <p class="lead">A sentence or two about who you are, what you do, and what you're curious about. Edit this in index.html.</p>
+      <div class="actions">
+        <a class="btn primary" href="photo365/">See the Photo365 project</a>
+        <a class="btn" href="resume.html">Resume</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Photo365</p>
+        <div class="split">
+          <div>
+            <h2>One photo, every day</h2>
+            <p class="muted" id="p365-status">A photo a day for a year.</p>
+            <a class="btn" href="photo365/">Open the calendar</a>
+          </div>
+          <div class="strip" id="p365-strip" aria-label="Latest photos"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Interests</p>
+        <h2>Things I spend time on</h2>
+        <!-- EDIT: change, add, or remove cards -->
+        <div class="cards">
+          <div class="card"><div class="icon">📷</div><h3>Photography</h3><p>What you shoot, the camera you carry, what you're learning.</p></div>
+          <div class="card"><div class="icon">📚</div><h3>Interest two</h3><p>A short line about it.</p></div>
+          <div class="card"><div class="icon">🧭</div><h3>Interest three</h3><p>A short line about it.</p></div>
+          <div class="card"><div class="icon">🛠️</div><h3>Interest four</h3><p>A short line about it.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <p class="eyebrow">Contact</p>
+        <h2>Say hello</h2>
+        <!-- EDIT: put in your real links -->
+        <div class="links">
+          <a class="btn" href="mailto:you@example.com">Email</a>
+          <a class="btn" href="https://github.com/YOUR_GITHUB_USERNAME">GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/">LinkedIn</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© <span id="yr"></span> Stephan</span><a href="photo365/">Photo365</a></div>
+  </footer>
+
+  <script src="photo365/config.js"></script>
+  <script src="photo365/common.js"></script>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    P365.loadEntries().then(function (list) {
+      var strip = document.getElementById('p365-strip');
+      var latest = list.slice(-6).reverse();
+      latest.forEach(function (e) {
+        var a = document.createElement('a');
+        a.href = 'photo365/#day/' + e.date;
+        a.innerHTML = '<img loading="lazy" alt="">';
+        a.firstChild.src = P365.imgUrl(e, 'thumb');
+        a.firstChild.alt = e.caption || ('Photo for ' + P365.prettyDate(e.date));
+        strip.appendChild(a);
+      });
+      var s = P365.stats(list);
+      var startTxt = P365.prettyDate(s.start, { month: 'long', day: 'numeric', year: 'numeric' });
+      document.getElementById('p365-status').textContent = s.today < 1
+        ? 'A photo a day for a year, starting ' + startTxt + '.' + (s.practice ? ' ' + s.practice + ' practice shots so far.' : '')
+        : s.count + ' photos so far. Today is day ' + Math.min(s.today, s.total) + ' of ' + s.total + '.';
+    }).catch(function () {});
+  </script>
+</body>
+</html>

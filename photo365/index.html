@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Photo365 · Stephan</title>
+  <meta name="description" content="One photo every day for a year.">
+  <meta name="theme-color" content="#0d0d0e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Photo365">
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <link rel="stylesheet" href="p365.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="../">Stephan</a>
+      <nav class="nav" aria-label="Main">
+        <a href="../">Home</a>
+        <a href="./" aria-current="page">Photo365</a>
+        <a href="../resume.html">Resume</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap p365-head">
+      <div>
+        <h1 id="title">Photo365</h1>
+        <p class="sub" id="sub">One photo, every day, for a year.</p>
+      </div>
+      <div class="stats" id="stats" hidden>
+        <div class="stat"><b id="s-day">–</b><span>Day</span></div>
+        <div class="stat"><b id="s-count">–</b><span>Photos</span></div>
+        <div class="stat"><b id="s-streak">–</b><span>Day streak</span></div>
+      </div>
+      <div class="progress" aria-hidden="true"><i id="s-bar"></i></div>
+    </section>
+
+    <div class="viewbar">
+      <div class="wrap">
+        <div class="seg" role="group" aria-label="View">
+          <button data-view="calendar" aria-pressed="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            <span class="lbl">Calendar</span></button>
+          <button data-view="grid" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="10" y="10" width="5" height="5" rx="1"/><rect x="17" y="10" width="4" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg>
+            <span class="lbl">365 Grid</span></button>
+          <button data-view="gallery" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="11" rx="1.5"/><rect x="13" y="3" width="8" height="7" rx="1.5"/><rect x="3" y="16" width="8" height="5" rx="1.5"/><rect x="13" y="12" width="8" height="9" rx="1.5"/></svg>
+            <span class="lbl">Gallery</span></button>
+        </div>
+        <div class="extra" id="extra"></div>
+      </div>
+    </div>
+
+    <div class="wrap view" id="view" aria-live="polite"></div>
+  </main>
+
+  <a class="fab" id="fab" href="add.html" hidden aria-label="Add a photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
+
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo">
+    <div class="lb-top">
+      <button class="iconbtn" id="lb-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="title" id="lb-title"></div>
+      <div class="act"><a class="iconbtn" id="lb-edit" hidden aria-label="Edit this day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg></a></div>
+    </div>
+    <div class="lb-body">
+      <div class="lb-fig" id="lb-fig">
+        <button class="iconbtn navbtn prev" id="lb-prev" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <img id="lb-img" alt="">
+        <button class="iconbtn navbtn next" id="lb-next" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="lb-info">
+        <div class="date" id="lb-date"></div>
+        <h2 class="caption" id="lb-cap"></h2>
+        <div class="prose" id="lb-post"></div>
+        <div class="lb-pager">
+          <button class="btn ghost" id="lb-prev2">← Previous</button>
+          <button class="btn ghost" id="lb-next2">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

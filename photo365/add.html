@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Add a photo · Photo365</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0d0d0e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Photo365">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <link rel="stylesheet" href="p365.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Photo365</a>
+      <div class="toplinks">
+        <a class="iconbtn" href="./" aria-label="View calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></a>
+        <button class="iconbtn" id="open-settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="add">
+    <!-- One-time setup, saved only on this device -->
+    <section id="setup" hidden>
+      <h1>Set up uploading</h1>
+      <p class="muted">These are saved only on this device, so only you can post. You only do this once per device.</p>
+      <form class="panel" id="setup-form" autocomplete="off">
+        <div class="field"><label for="f-cloud">Cloudinary cloud name</label><input class="input" id="f-cloud" required autocapitalize="off" spellcheck="false"></div>
+        <div class="field"><label for="f-preset">Cloudinary upload preset (unsigned)</label><input class="input" id="f-preset" required autocapitalize="off" spellcheck="false"></div>
+        <div class="field"><label for="f-owner">GitHub username</label><input class="input" id="f-owner" required autocapitalize="off" spellcheck="false"></div>
+        <div class="field"><label for="f-repo">GitHub repository</label><input class="input" id="f-repo" required autocapitalize="off" spellcheck="false"><small>Usually yourname.github.io</small></div>
+        <div class="field"><label for="f-branch">Branch</label><input class="input" id="f-branch" required autocapitalize="off" spellcheck="false"></div>
+        <div class="field"><label for="f-token">GitHub access token</label><input class="input" id="f-token" type="password" required autocapitalize="off" spellcheck="false"><small>Fine-grained token with Contents: read and write on this one repository. See README.</small></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary" type="submit">Save and test</button>
+          <button class="btn ghost" type="button" id="cancel-setup" hidden>Cancel</button>
+          <button class="btn danger" type="button" id="forget" hidden>Forget this device</button>
+        </div>
+        <p class="status" id="setup-status"></p>
+      </form>
+    </section>
+
+    <!-- Daily upload -->
+    <section id="editor" hidden>
+      <div class="topline"><p class="eyebrow" style="margin:0" id="mode-label">New entry</p></div>
+      <h1 id="ed-title">Today</h1>
+
+      <div class="panel">
+        <div class="field">
+          <label for="date">Date</label>
+          <div class="daterow"><input class="input" type="date" id="date"><span class="daypill" id="daypill"></span></div>
+        </div>
+
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept="image/*">
+          <div class="hint" id="drop-hint">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="margin:auto"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            <b>Choose a photo</b><span>Take one or pick from your library</span>
+          </div>
+          <img id="preview" alt="" hidden>
+        </label>
+        <p class="status" id="photo-note"></p>
+
+        <div class="field" style="margin-top:14px">
+          <label for="caption">Caption <span style="color:var(--faint)">(optional)</span></label>
+          <input class="input" id="caption" maxlength="200" placeholder="A line about this photo">
+        </div>
+
+        <label class="toggle">
+          <span><b>Add a post</b><small>Write more: the story behind the shot, thoughts on the day</small></span>
+          <input type="checkbox" id="want-post">
+        </label>
+        <div id="post-wrap" hidden>
+          <div class="tabs"><button type="button" data-t="write" aria-pressed="true">Write</button><button type="button" data-t="preview" aria-pressed="false">Preview</button></div>
+          <textarea class="input" id="post" placeholder="Write as much or as little as you like…"></textarea>
+          <div class="preview prose" id="post-preview" hidden></div>
+          <div class="mdhelp">**bold** · *italic* · [link](https://…) · ## heading · - list · &gt; quote</div>
+        </div>
+      </div>
+
+      <div class="panel" id="catchup" hidden>
+        <p class="lbl" style="margin:0 0 10px">Missed days. Tap to fill one in.</p>
+        <div class="chips" id="missed"></div>
+      </div>
+
+      <div class="panel" id="recent-panel" hidden>
+        <p class="lbl" style="margin:0 0 10px">Recent. Tap to edit.</p>
+        <div class="recent" id="recent"></div>
+      </div>
+
+      <button class="btn danger" id="delete" hidden style="width:100%">Remove this day's entry</button>
+    </section>
+  </main>
+
+  <div class="publishbar" id="publishbar" hidden>
+    <div class="in">
+      <button class="btn primary" id="publish">Publish</button>
+      <a class="btn ghost" id="view-link" hidden href="./">View</a>
+    </div>
+    <div style="max-width:640px;margin:0 auto">
+      <div class="bar" id="bar"><i></i></div>
+      <p class="status" id="status" role="status"></p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

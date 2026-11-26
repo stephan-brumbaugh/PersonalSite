@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Resume · Stephan</title>
+  <meta name="theme-color" content="#0d0d0e">
+  <link rel="icon" href="photo365/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+  <style>
+    .resume { padding: 56px 0 72px; max-width: 860px; }
+    .resume header.top { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
+    .resume h1 { margin: 0; }
+    .resume h2 { font-family: var(--sans); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .item { display: grid; gap: 2px 24px; margin-bottom: 22px; }
+    @media (min-width: 640px) { .item { grid-template-columns: 150px 1fr; } }
+    .item .when { color: var(--muted); font-size: .9rem; }
+    .item h3 { margin: 0; }
+    .item .org { color: var(--muted); }
+    .item ul { margin: 8px 0 0; padding-left: 1.1em; color: #cfcfd3; }
+    .skills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skills span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: .9rem; color: #cfcfd3; }
+    @media print {
+      :root { --bg: #fff; --text: #111; --muted: #555; --line: #ddd; }
+      .site-header, .site-footer, .no-print { display: none !important; }
+      body { background: #fff; color: #111; }
+      .item ul, .skills span { color: #222; }
+      .resume { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Stephan</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="photo365/">Photo365</a>
+        <a href="resume.html" aria-current="page">Resume</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap resume">
+    <!-- EDIT: everything below is placeholder text -->
+    <header class="top">
+      <div>
+        <h1>Stephan</h1>
+        <p class="muted" style="margin:0">Your title · City, State</p>
+      </div>
+      <button class="btn no-print" onclick="window.print()">Save as PDF</button>
+    </header>
+
+    <p class="prose">Two or three sentences summarizing your experience and what you're looking for.</p>
+
+    <h2>Experience</h2>
+    <div class="item">
+      <div class="when">2022 – Present</div>
+      <div>
+        <h3>Job title</h3>
+        <div class="org">Organization</div>
+        <ul><li>What you did and the result.</li><li>Another accomplishment.</li></ul>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">2018 – 2022</div>
+      <div>
+        <h3>Job title</h3>
+        <div class="org">Organization</div>
+        <ul><li>What you did and the result.</li></ul>
+      </div>
+    </div>
+
+    <h2>Education</h2>
+    <div class="item">
+      <div class="when">Year</div>
+      <div><h3>Degree, Field</h3><div class="org">School</div></div>
+    </div>
+
+    <h2>Skills</h2>
+    <div class="skills"><span>Skill</span><span>Skill</span><span>Skill</span><span>Photography</span></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>Stephan</span><a href="./">Home</a></div>
+  </footer>
+</body>
+</html>
