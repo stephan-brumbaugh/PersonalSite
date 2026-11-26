@@ -44,7 +44,8 @@
     thumb: 'c_fill,g_auto,w_360,h_360,f_auto,q_auto',
     gallery: 'c_limit,w_900,f_auto,q_auto',
     full: 'c_limit,w_2000,h_2000,f_auto,q_auto',
-    share: 'c_limit,w_2160,h_2160,f_jpg,q_90'
+    share: 'c_limit,w_2160,h_2160,f_jpg,q_90',
+    og: 'c_limit,w_1200,h_1200,f_jpg,q_85'
   };
   function imgUrl(e, size) {
     if (e.url) return new URL(e.url, scriptSrc).href; // direct URL fallback
@@ -169,6 +170,24 @@
       .then(function (j) { return j.content.sha; });
   }
   // Read, change, write; retries once if the file changed underneath us.
+  // Write or delete any single text file in the repo (used for the per-day share pages).
+  function fileSha(s, path) {
+    return gh(s, '/contents/' + path + '?ref=' + encodeURIComponent(s.branch)).then(function (j) { return j.sha; })
+      .catch(function (e) { if (e.status === 404) return null; throw e; });
+  }
+  function ghPutFile(s, path, text, message) {
+    return fileSha(s, path).then(function (sha) {
+      var body = { message: message, content: b64encode(text), branch: s.branch };
+      if (sha) body.sha = sha;
+      return gh(s, '/contents/' + path, { method: 'PUT', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+    });
+  }
+  function ghDeleteFile(s, path, message) {
+    return fileSha(s, path).then(function (sha) {
+      if (!sha) return null;
+      return gh(s, '/contents/' + path, { method: 'DELETE', body: JSON.stringify({ message: message, sha: sha, branch: s.branch }), headers: { 'Content-Type': 'application/json' } });
+    });
+  }
   function ghUpdate(mutate, message, s) {
     s = s || getSettings();
     function attempt(n) {
@@ -209,6 +228,6 @@
     cfg: CFG, toKey: toKey, fromKey: fromKey, todayKey: todayKey, addDays: addDays, diffDays: diffDays, prettyDate: prettyDate,
     getSettings: getSettings, saveSettings: saveSettings, isAdmin: isAdmin,
     imgUrl: imgUrl, startKey: startKey, dayNumber: dayNumber, isPractice: isPractice, dayLabel: dayLabel, stats: stats,
-    esc: esc, explain: explain, markdown: markdown, ghRead: ghRead, ghUpdate: ghUpdate, loadEntries: loadEntries
+    esc: esc, explain: explain, markdown: markdown, ghRead: ghRead, ghUpdate: ghUpdate, ghPutFile: ghPutFile, ghDeleteFile: ghDeleteFile, loadEntries: loadEntries
   };
 })();

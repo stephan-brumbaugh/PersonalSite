@@ -114,15 +114,27 @@ On your phone only, the Photo365 page also shows a **+** button and empty days y
 
 ## Sharing to Instagram and Facebook
 
-Once a day has a photo, the app shows a **Share to Instagram or Facebook** box under it. It appears right after you publish, and whenever you open a past day in the app.
+Once a day has a photo, the app shows a sharing box under it. It appears right after you publish, and whenever you open a past day in the app.
 
 1. Edit the text in the box if you want. It starts as your caption plus the day number and `#photo365`.
-2. Tap **Copy caption & share photo**. The caption is copied, and your phone's share menu opens with the photo.
+2. Tap **Share to Instagram**. The caption is copied, and your phone's share menu opens with the photo.
 3. Pick **Instagram** (Feed or Stories). When you get to the caption, long-press the box and tap **Paste**.
 
-**To post to Facebook at the same time:** in Instagram, turn on **Share to Facebook** on the final screen before posting. That switch only appears once your Instagram and Facebook are linked in **Accounts Center** (Instagram → Settings → Accounts Center).
-
 On a computer, the browser can't open a share menu, so the button saves the photo to your downloads and copies the caption instead.
+
+### Facebook post with a link back to your site
+
+The same box has a **Facebook post with a link** section, made for blog posts:
+
+1. The text starts as your caption plus your post, without the formatting symbols. Edit it if you like.
+2. Tap **Share to Facebook**. The text is copied, and Facebook opens with a link to that day's post. On a phone, pick Facebook from the share menu.
+3. In Facebook, paste the text above the link and post. Facebook shows the photo and caption as a preview, and tapping it opens the post on your site.
+
+The link goes to a small page the app makes for each day, `photo365/day/DATE.html`, which forwards visitors to that day on the site. GitHub needs about a minute to put a new page online, so right after publishing the button says **Link going live…** and turns on by itself once the link works. Removing an entry removes its page too.
+
+If you edit a day after sharing it, Facebook may keep showing the old preview. To refresh it, paste the link into Facebook's Sharing Debugger (developers.facebook.com/tools/debug) and click **Scrape Again**.
+
+You can also still post the photo itself to Facebook through Instagram: turn on **Share to Facebook** on Instagram's last screen. That switch appears once your accounts are linked in Instagram's **Accounts Center**.
 
 ## Practice before Day 1
 

@@ -91,14 +91,24 @@
       </div>
 
       <div class="panel" id="share-panel" hidden>
-        <h3 style="margin:0 0 4px">Share to Instagram or Facebook</h3>
+        <h3 style="margin:0 0 4px">Instagram post with the photo</h3>
         <p class="lbl" style="margin:0 0 12px">Copies this caption and opens your phone's share menu with the photo. Pick Instagram, then paste the caption.</p>
         <textarea class="input" id="share-text" style="min-height:110px" aria-label="Caption to share"></textarea>
         <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
           <button class="btn primary" type="button" id="share-btn" style="flex:1">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
-            Copy caption &amp; share photo</button>
+            Share to Instagram</button>
           <button class="btn ghost" type="button" id="share-copy">Copy caption only</button>
+        </div>
+        <div class="fbshare">
+          <h3 style="margin:0 0 4px">Facebook post with a link</h3>
+          <p class="lbl" style="margin:0 0 12px">Shares a link to this post on your site. Facebook shows the photo and caption as a preview. This text is copied so you can paste it above the link.</p>
+          <textarea class="input" id="fb-text" style="min-height:110px" aria-label="Text for the Facebook post"></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn primary" type="button" id="fb-btn" style="flex:1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span> Share to Facebook</span></button>
+            <button class="btn ghost" type="button" id="fb-copy-link">Copy link only</button>
+          </div>
         </div>
         <p class="status" id="share-status" role="status"></p>
       </div>

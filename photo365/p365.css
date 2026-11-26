@@ -169,3 +169,6 @@ textarea.input { min-height: 220px; resize: vertical; line-height: 1.6; }
 .toplinks { display: flex; gap: 6px; }
 details.help summary { cursor: pointer; color: var(--muted); font-size: .9rem; }
 details.help ol { color: var(--muted); font-size: .9rem; padding-left: 1.2em; }
+
+.fbshare { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+#fb-btn.waiting { opacity: .6; }

@@ -116,7 +116,7 @@
   // Copies the caption, then hands the photo to the phone's share menu.
   // The photo is fetched ahead of time because phones only allow the share
   // menu to open straight from a tap.
-  var justUploaded = null, shareFile = null, shareFor = null;
+  var justUploaded = null, shareFile = null, shareFor = null, dayPageWrittenAt = {};
   function shareText(k) {
     var list = entries.length ? entries : [{ date: k }];
     var tag = P.isPractice(k, list) ? 'Practice shot' : 'Day ' + P.dayNumber(k, list) + ' of ' + (P.cfg.days || 365);
@@ -127,7 +127,9 @@
     $('share-panel').hidden = !cur;
     if (!cur) return;
     $('share-text').value = shareText(k);
+    $('fb-text').value = fbText();
     $('share-status').textContent = ''; $('share-status').className = 'status';
+    if (fb.k !== k || !fb.ready) { fbSet('Checking link…', false); checkFbLink(k, dayPageWrittenAt[k]); }
     if (shareFor === k && shareFile) return;
     shareFor = k; shareFile = null;
     var name = 'photo365-' + k + '.jpg';
@@ -167,6 +169,105 @@
   };
   $('share-copy').onclick = function () {
     copyText($('share-text').value).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Caption copied.'; });
+  };
+
+  // ───────────── Per-day share pages ─────────────
+  // Facebook needs a real page per post to show the photo and caption as a
+  // link preview. Each published day gets photo365/day/DATE.html, which holds
+  // the preview details and forwards visitors to that day on the site.
+  function dayRepoPath(k) { return S.path.replace(/[^\/]*$/, '') + 'day/' + k + '.html'; }
+  function dayUrl(k) { return new URL('day/' + k + '.html', location.href).href; }
+  function plain(md) {
+    return String(md || '')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
+      .replace(/^#{1,3} /gm, '').replace(/^> ?/gm, '').replace(/^\s*[-*] /gm, '• ')
+      .replace(/\*\*([^*]+)\*\*/g, '$1').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1$2')
+      .replace(/(^|\W)_([^_]+)_(?=\W|$)/g, '$1$2').replace(/`([^`]+)`/g, '$1').trim();
+  }
+  function dayPageHtml(e, list) {
+    var k = e.date, E = P.esc;
+    var label = P.isPractice(k, list) ? 'Practice shot' : 'Day ' + P.dayNumber(k, list) + ' of ' + (P.cfg.days || 365);
+    var title = (e.caption ? e.caption + ' · ' : '') + label;
+    var text = (plain(e.post) || e.caption || '').replace(/\s+/g, ' ');
+    var desc = (text ? (text.length > 200 ? text.slice(0, 197).replace(/\s+\S*$/, '') + '…' : text) : P.prettyDate(k));
+    var url = dayUrl(k), img = P.imgUrl(e, 'og'), back = '../#day/' + k;
+    return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+      '<title>' + E(title) + '</title>\n' +
+      '<meta name="description" content="' + E(desc) + '">\n' +
+      '<link rel="canonical" href="' + E(url) + '">\n' +
+      '<meta property="og:type" content="article">\n' +
+      '<meta property="og:site_name" content="' + E(P.cfg.title || 'Photo365') + '">\n' +
+      '<meta property="og:title" content="' + E(title) + '">\n' +
+      '<meta property="og:description" content="' + E(desc) + '">\n' +
+      '<meta property="og:url" content="' + E(url) + '">\n' +
+      '<meta property="og:image" content="' + E(img) + '">\n' +
+      '<meta name="twitter:card" content="summary_large_image">\n' +
+      '<script>location.replace(' + JSON.stringify(back) + ');</script>\n' +
+      '<style>body{background:#0d0d0e;color:#ececec;font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:0 auto;padding:24px 16px}img{max-width:100%;border-radius:6px}a{color:#e4b363}</style>\n' +
+      '</head>\n<body>\n<p><a href="' + E(back) + '">View on the site →</a></p>\n' +
+      '<img src="' + E(img) + '" alt="' + E(e.caption || label) + '">\n' +
+      '<p>' + E(P.prettyDate(k)) + ' · ' + E(label) + '</p>\n' +
+      (e.caption ? '<h1>' + E(e.caption) + '</h1>\n' : '') + P.markdown(e.post || '') + '\n</body>\n</html>\n';
+  }
+  function writeDayPage(e) {
+    return P.ghPutFile(S, dayRepoPath(e.date), dayPageHtml(e, entries), 'Share page for Photo365 ' + e.date);
+  }
+
+  // ───────────── Share to Facebook (link back to the post) ─────────────
+  var fb = { k: null, ready: false, timer: null };
+  function fbText() {
+    if (!cur) return '';
+    return [cur.caption || '', plain(cur.post)].filter(Boolean).join('\n\n');
+  }
+  function fbSet(label, ready) { fb.ready = ready; $('fb-btn').lastChild.textContent = ' ' + label; $('fb-btn').classList.toggle('waiting', !ready); }
+  function checkFbLink(k, written) {
+    clearTimeout(fb.timer);
+    fb.k = k;
+    fetch(dayUrl(k) + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) {
+      if (fb.k !== k) return;
+      if (r.ok) { fbSet('Share to Facebook', true); return; }
+      if (!written) {
+        // An older entry without a share page yet: make one now
+        fbSet('Getting the link ready…', false);
+        return writeDayPage(cur).then(function () { dayPageWrittenAt[k] = Date.now(); checkFbLink(k, dayPageWrittenAt[k]); }, function (e) {
+          fbSet('Share to Facebook', false);
+          $('share-status').className = 'status err';
+          $('share-status').textContent = 'Couldn’t make the share link: ' + P.explain(e);
+        });
+      }
+      fbSet('Link going live… (about a minute)', false);
+      if (Date.now() - written < 5 * 60000) fb.timer = setTimeout(function () { checkFbLink(k, written); }, 8000);
+      else fbSet('Link not live yet. Try again later.', false);
+    }).catch(function () { if (fb.k === k) fbSet('Share to Facebook', true); });
+  }
+  $('fb-btn').onclick = function () {
+    var k = $('date').value, out = $('share-status');
+    if (!cur) return;
+    if (!fb.ready) { out.className = 'status'; out.textContent = 'GitHub is still publishing the page for this post. The button turns on when the link works.'; return; }
+    var url = dayUrl(k), text = $('fb-text').value;
+    var copied = text ? copyText(text).then(function () { return true; }, function () { return false; }) : Promise.resolve(false);
+    var done = function () {
+      copied.then(function (ok) {
+        out.className = 'status ok';
+        out.textContent = ok ? 'Your text is copied. In Facebook, tap where it says to write something and Paste. The link preview is added for you.' : 'Opened Facebook with the link.';
+      });
+    };
+    var touch = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+    if (touch && navigator.share) {
+      // Phone: share sheet → pick Facebook
+      navigator.share({ url: url }).then(done).catch(function (e) {
+        if (e && e.name === 'AbortError') { out.className = 'status'; out.textContent = 'Share cancelled.'; return; }
+        openSharer();
+      });
+    } else openSharer();
+    function openSharer() {
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), 'fbshare', 'width=640,height=640');
+      done();
+    }
+  };
+  $('fb-copy-link').onclick = function () {
+    copyText(dayUrl($('date').value)).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Link copied.'; });
   };
   $('date').addEventListener('change', function () {
     if (!$('date').value) return;
@@ -313,7 +414,10 @@
       setBar(100);
       try { localStorage.removeItem(draftKey(k)); } catch (e) {}
       file = null; prepared = null; $('file').value = '';
-      shareFor = null; setEntries(data.entries); loadDate(k);
+      shareFor = null; fb.k = null; setEntries(data.entries);
+      dayPageWrittenAt[k] = Date.now();
+      writeDayPage(byDate[k]).catch(function () { delete dayPageWrittenAt[k]; });
+      loadDate(k);
       $('share-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
       setStatus((n === 'practice' ? 'Published practice shot. It won’t count toward the 365.' : 'Published ' + n + '.') + ' The public site updates in about a minute.', 'ok');
       setTimeout(function () { setBar(null); }, 800);
@@ -330,6 +434,7 @@
     P.ghUpdate(function (data) {
       data.entries = data.entries.filter(function (e) { return e.date !== k; }); return data;
     }, 'Remove Photo365 entry ' + k, S).then(function (data) {
+      P.ghDeleteFile(S, dayRepoPath(k), 'Remove share page for Photo365 ' + k).catch(function () {});
       try { localStorage.removeItem(draftKey(k)); } catch (e) {}
       setEntries(data.entries); loadDate(k); setStatus('Removed.', 'ok');
     }).catch(function (e) { setStatus(P.explain(e), 'err'); }).then(function () { busy = false; });
