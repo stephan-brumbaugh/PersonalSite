@@ -1,117 +1,158 @@
 # Stephan's site + Photo365
 
-A personal site (home, interests, resume) with a Photo365 section: a calendar, a day-by-day 365 grid, and a gallery. You post from your phone through an installable app page.
+Setup takes about 30 minutes, done once. You'll make two free accounts, change one file, and set up your phone.
 
-**Where things live**
+**How it fits together**
 
-| What | Where | Why |
+- **GitHub Pages** hosts the site itself.
+- **Cloudinary** stores the photos, so GitHub doesn't fill up with images.
+- **`photo365/entries.json`** in your GitHub repo holds the dates, captions and posts. The upload page on your phone writes to it for you.
+
+**You'll collect four things along the way.** Keep them in a note:
+
+| | Example | From |
 |---|---|---|
-| The site (HTML, CSS, JS) | GitHub Pages | Free, simple |
-| Photos | Cloudinary (free plan) | Keeps big files out of GitHub, makes thumbnails automatically |
-| Captions and posts | `photo365/entries.json` in your repo | Small text file, saved by the upload page |
-
-Your phone shrinks each photo to 2560 px on the long side (about 1 MB) before uploading, so a full year is roughly 400 MB, well inside Cloudinary's free plan.
+| Cloudinary cloud name | `dxyz12abc` | Step 2 |
+| Cloudinary upload preset name | `p365-k8f2q` | Step 2 |
+| GitHub token | `github_pat_11AB…` | Step 3 |
+| Your GitHub username | `sbrumbaugh` | Step 1 |
 
 ---
 
-## 1. Put the site on GitHub Pages
+## Step 1. Put the site on GitHub
 
-1. Create a GitHub account if you don't have one.
-2. Create a **public** repository named exactly `YOUR-USERNAME.github.io`.
-3. Upload everything in this folder to it (on github.com: **Add file → Upload files**, drag the whole folder contents in, commit). Include the hidden `.nojekyll` file if you can; it's optional.
-4. Go to **Settings → Pages**. Under *Build and deployment*, choose **Deploy from a branch**, branch `main`, folder `/ (root)`. Save.
-5. After a minute your site is at `https://YOUR-USERNAME.github.io`.
+1. Sign in to github.com (or create an account). Your username is the first thing in the note.
+2. Click **+** (top right) → **New repository**. Name it exactly **`your-username.github.io`**, set it to **Public**, and create it.
+3. On the new repo's page, click **uploading an existing file**.
+4. Unzip `stephan-site.zip` on your computer. Open the unzipped folder, select **everything inside it**, and drag that into the browser. Don't drag the folder itself, or the whole site ends up one level too deep. Click **Commit changes**.
+5. **Check:** the repo's main page should list `index.html`, `resume.html`, `assets` and `photo365` at the top level. If you instead see a single folder, the site is one level deep; see *"My site is inside a folder"* below.
+6. Go to **Settings → Pages**. Under **Build and deployment**, pick **Deploy from a branch**, branch **main**, folder **/ (root)**, and **Save**.
+7. Wait a minute or two, then open `https://your-username.github.io`.
 
-## 2. Set up Cloudinary
+### Your three addresses
 
-Cloudinary changes its screens often, so the names below may differ slightly. You need just two things from it: your **cloud name** and an **unsigned upload preset**.
+Everything in Photo365 lives inside the `photo365` folder, one level below the home page:
 
-1. Sign up at cloudinary.com (free plan). If it asks what you're building, any answer is fine.
-2. **Cloud name:** it's shown on the console's home/dashboard page, and also under **Settings → API Keys** at the top of the page. It's a short word like `dxyz12abc`. (You don't need the API key or secret.)
-3. **Upload preset:** while signed in, go straight to
-   `https://console.cloudinary.com/app/settings/upload/presets`
-   (or **Settings**, the gear at the bottom left, then **Upload Presets**). Click **Add Upload Preset**.
+| Page | Address |
+|---|---|
+| Home | `https://your-username.github.io/` |
+| Photo365 | `https://your-username.github.io/photo365/` |
+| **Post a photo** (the phone app) | `https://your-username.github.io/photo365/add.html` |
+
+The easy way to find the posting page is to open your Photo365 page and tap **Post a photo** at the very bottom.
+
+### My site is inside a folder, or the repo has a different name
+
+That works too; everything just moves down a level. If the repo is called `website` instead of `your-username.github.io`, the Photo365 page is `https://your-username.github.io/website/photo365/`, and the posting page is that address plus `add.html`.
+
+The setup screen on your phone (Step 5) works out where `entries.json` is from the page's address. If saving ever fails with "Not Found", check that the **Where entries.json is in the repo** box matches the real file path in the repo, starting from the top level, for example `website/photo365/entries.json`.
+
+## Step 2. Set up Cloudinary
+
+Cloudinary rearranges its screens now and then, so labels may be slightly different. You need two things: the **cloud name** and an **unsigned upload preset**.
+
+1. Sign up at cloudinary.com on the free plan. If it asks what you're building, any answer is fine.
+2. **Cloud name:** shown on the console's home page, and at the top of **Settings → API Keys**. It's a short code like `dxyz12abc`. You don't need the API key or secret.
+3. **Upload preset:** while signed in, go to `https://console.cloudinary.com/app/settings/upload/presets`. You can also get there from **Settings** (gear icon, bottom left) → **Upload Presets**. Click **Add Upload Preset**.
 4. On the **General** tab:
-   - **Signing mode:** Unsigned. This is the only setting that really matters.
-   - **Upload preset name:** leave the generated one or type something hard to guess, like `p365-` plus a few random letters.
-   - **Asset folder** (some accounts call it **Folder**): `photo365`. Optional.
-   - Leave everything else as it is.
-5. Optional: on the **Optimize and Deliver** tab, set **Allowed formats** to `jpg,png,heic,webp`.
-6. Click **Save**. The preset now appears in the list with its name and "Unsigned".
+   - **Signing mode: Unsigned.** This is the setting that matters.
+   - **Upload preset name:** keep the generated name or type something hard to guess.
+   - **Folder** (or **Asset folder**): `photo365`. Optional; it just keeps your Media Library tidy.
+5. Click **Save**. The preset shows up in the list marked **Unsigned**. Copy its name into your note.
 
-Treat the preset name like a password. It isn't published on your site; it's only stored on your phone.
+Don't post the preset name anywhere public; it's only stored on your phone.
 
-## 3. Create a GitHub token for uploading
+## Step 3. Make a GitHub token
 
-The upload page saves captions to `entries.json` through the GitHub API, so it needs a token that can write to *this one repo only*.
+This lets your phone save captions and posts to the repo. It can only touch this one repo.
 
-1. github.com → your avatar → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
-2. **Repository access:** Only select repositories → `YOUR-USERNAME.github.io`.
-3. **Permissions → Repository permissions → Contents:** Read and write. Nothing else.
-4. Expiration: up to 1 year (put a reminder in your calendar to renew it).
-5. Copy the token (starts with `github_pat_`).
+1. On github.com: your profile picture → **Settings** → **Developer settings** (bottom of the left menu) → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
+2. **Token name:** `Photo365 phone`. **Expiration:** pick a date up to a year out and put a reminder in your calendar a week before.
+3. **Repository access:** **Only select repositories** → your site repo.
+4. **Permissions → Repository permissions → Contents → Read and write.** Leave everything else alone.
+5. **Generate token** and copy it right away (it starts with `github_pat_`). GitHub won't show it again.
 
-## 4. Edit `photo365/config.js`
+## Step 4. Edit `photo365/config.js`
 
-Fill in `cloudName`, your GitHub `owner` and `repo`, then commit the change.
+Visitors' browsers need your cloud name to load the photos, so it has to be in this file.
 
-`startDate` is already set to `"2027-01-01"`, so that's Day 1.
+1. In your repo, open `photo365` → `config.js` → pencil icon (**Edit**).
+2. Change these lines:
+   - `cloudName: "YOUR_CLOUD_NAME"` → your cloud name
+   - `owner: "YOUR_GITHUB_USERNAME"` → your username
+   - `repo: "YOUR_GITHUB_USERNAME.github.io"` → your repo name
+   - Only if your site is inside a folder: `path` (see the comment above it)
+3. **Commit changes**.
 
-### Practice before Day 1
+`startDate` is already `"2027-01-01"`. Anything you post before then is a practice shot (see below).
 
-Anything you post before January 1 counts as **practice**:
+## Step 5. Set up your phone
 
-- It shows on the calendar and in the gallery with a "Practice" label.
-- It appears in its own section above the 365 grid.
-- Your day streak includes practice days.
-- Practice photos don't count toward the 365. Missed practice days aren't flagged.
-- Until Day 1, the header counts down the days and shows how many practice shots you've taken.
-- Once there are both kinds, the gallery gets a filter: All, The 365, or Practice.
+1. On your phone, open your Photo365 page and tap **Post a photo** at the bottom.
+2. Install it:
+   - **iPhone:** in Safari, tap **Share** → **Add to Home Screen** → **Add**. Then **open Photo365 from the new home-screen icon** and do step 3 there. iPhone keeps the installed app's storage separate from Safari, so settings entered in Safari won't carry over.
+   - **Android:** Chrome offers **Install app**, or use **⋮ → Add to Home screen**. Once it's installed, Photo365 also appears in the **Share** menu from your gallery.
+3. The app opens on **Set up uploading**. Fill in your four values from the note. Branch and the entries.json path are filled in for you. Tap **Save and test**.
+4. **Check:** it should say **Connected** and switch to the posting screen.
 
-## 5. Install it on your phone
+## Every day
 
-Open `https://YOUR-USERNAME.github.io/photo365/add.html` on your phone.
+1. Open the Photo365 app. It opens to today.
+2. Tap the photo box to take or choose a picture.
+3. Optionally add a caption. Switch on **Add a post** to write more. Posts take simple formatting: `**bold**`, `*italic*`, `[link text](https://…)`, `## heading`, `- list item`, `> quote`.
+4. Tap **Publish**. It shows on your phone right away and for everyone else within about a minute.
 
-- **iPhone (Safari):** Share button → **Add to Home Screen**. Open the new Photo365 icon, then enter your settings *inside the installed app* (iPhone keeps the app's storage separate from Safari).
-- **Android (Chrome):** you'll be offered **Install app**, or use ⋮ → **Add to Home screen / Install app**. Bonus: once installed, Photo365 shows up in the **Share** menu from Google Photos or your gallery, so you can share a photo straight into a new entry.
+Other things you can do:
 
-On first open you'll see **Set up uploading**: enter the Cloudinary cloud name, upload preset, GitHub username, repo, and token. Tap **Save and test**. These stay on that device only.
+- **Fix a past day:** open it on the site and tap the pencil, or tap it under **Recent** in the app.
+- **Catch up:** missed days are listed in the app; tap one to fill it in.
+- **Change a photo:** open that day in the app and pick a new photo.
+- **Remove a day:** open it in the app and tap **Remove this day's entry** at the bottom. The photo stays in Cloudinary until you delete it from Cloudinary's Media Library.
+- **Drafts:** a half-written caption or post is kept if you close the app.
 
-Long-press the app icon (Android) for an **Add today's photo** shortcut.
+On your phone only, the Photo365 page also shows a **+** button and empty days you can tap to fill in. Visitors never see those.
 
-## Daily use
+## Practice before Day 1
 
-1. Open Photo365 and tap **+** (only you see it, because only your phone has the token).
-2. Choose or take a photo. The date defaults to today; change it to fill in a missed day.
-3. Optional: add a caption. Turn on **Add a post** if you want to write more. Posts support simple formatting: `**bold**`, `*italic*`, `[link](https://…)`, `## heading`, `- lists`, `> quotes`.
-4. Tap **Publish**. It appears on your phone right away and on the public site within about a minute (GitHub Pages rebuilds).
+Until January 1, 2027, everything you post is labeled **Practice**:
 
-To edit a day: open it on the site and tap the pencil, or tap it under **Recent** on the upload page. Missed days are listed so you can catch up. Drafts are kept if you close the app mid-sentence.
+- Practice shots appear on the calendar and in the gallery, and in their own section above the 365 grid.
+- They don't count toward the 365, and skipped practice days aren't marked as missed.
+- Your streak does count them.
+- The header counts down to Day 1.
 
-Removing an entry takes it off the site but leaves the photo in Cloudinary; delete it in the Cloudinary Media Library if you want it gone.
+To use a different start date, change `startDate` in `photo365/config.js`.
 
-## Customizing
+## Editing the rest of the site
 
-- Home page text, interests, contact links: `index.html` (look for `EDIT` comments).
-- Resume: `resume.html`. Visitors can tap **Save as PDF** to get a clean printable copy.
-- Colors and fonts: the `:root` block at the top of `assets/site.css`.
+- **Home page:** `index.html`. The intro and interest cards are a first draft from your resume, marked with `EDIT` comments. Put your real email and links in the contact section.
+- **Resume:** `resume.html`. The **Save as PDF** button prints a clean white version. References aren't on the public page because they include other people's phone numbers and emails.
+- **Colors and fonts:** the `:root` block at the top of `assets/site.css`.
 
-## Files
+To edit any file on github.com: open it, click the pencil, change it, **Commit changes**. The site updates in a minute or two.
+
+## When something goes wrong
+
+| What you see | What to do |
+|---|---|
+| A 404 page when opening the posting page | The address is missing a level. Open your Photo365 page and use the **Post a photo** link at the bottom. |
+| Photos show on your phone but are broken for everyone else | `cloudName` in `photo365/config.js` is still `YOUR_CLOUD_NAME` or has a typo. |
+| "Upload preset not found" or "must be whitelisted for unsigned uploads" | The preset name is wrong, or its signing mode isn't **Unsigned**. |
+| "Bad credentials" or a 401 error | The GitHub token expired or was mistyped. Tap the gear icon in the app and paste a new one. |
+| "Repo not found" | Check the repo name, and that the token was given access to that repo. |
+| "Not Found" when publishing, but setup said Connected | The **Where entries.json is in the repo** path is wrong. Tap the gear and fix it. |
+| On iPhone, it keeps asking for settings | You entered them in Safari. Open the home-screen icon and enter them there. |
+| A new photo isn't showing for others yet | Wait a minute or two while GitHub Pages updates. |
+
+## What's in the folder
 
 ```
-index.html, resume.html      Main site pages
-assets/site.css              Shared styles
-photo365/index.html, app.js  Calendar, 365 grid, gallery, day view
-photo365/add.html, admin.js  Upload page (the phone app)
-photo365/common.js           Shared helpers
+index.html, resume.html      Home page and resume
+assets/site.css              Shared look for every page
+photo365/index.html, app.js  Calendar, 365 grid, gallery, single-photo view
+photo365/add.html, admin.js  The posting app
 photo365/config.js           Your settings
-photo365/entries.json        Your captions and posts (written by the upload page)
-photo365/sw.js, manifest     Make it installable and work offline
+photo365/entries.json        Dates, captions and posts (written by the app)
+photo365/common.js           Shared code
+photo365/sw.js, manifest     Make it installable on your phone
 ```
-
-## Troubleshooting
-
-- **"Photo upload failed: Upload preset not found"**: the preset name is wrong, or the preset isn't set to Unsigned.
-- **"Bad credentials" / 401**: the GitHub token expired or was mistyped. Settings (gear icon) → paste a new one.
-- **"Repo not found"**: check the repo name and that the token was given access to that repo.
-- **New photo not showing for visitors**: wait a minute for GitHub Pages; it shows on your own phone immediately.

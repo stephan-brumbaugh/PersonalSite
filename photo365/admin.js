@@ -13,6 +13,7 @@
     $('f-owner').value = /^YOUR_/.test(S.owner) ? '' : S.owner;
     $('f-repo').value = /^YOUR_/.test(S.repo) ? '' : S.repo;
     $('f-branch').value = S.branch || 'main';
+    $('f-path').value = S.token ? S.path : guessPath($('f-repo').value);
     $('f-token').value = S.token;
     $('cancel-setup').hidden = !canCancel; $('forget').hidden = !S.token;
   }
@@ -20,6 +21,17 @@
     if (!$('f-repo').dataset.touched) $('f-repo').value = $('f-owner').value ? $('f-owner').value.toLowerCase() + '.github.io' : '';
   });
   $('f-repo').addEventListener('input', function () { $('f-repo').dataset.touched = '1'; });
+  ['f-owner', 'f-repo'].forEach(function (id) {
+    $(id).addEventListener('input', function () { if (!$('f-path').dataset.touched) $('f-path').value = guessPath($('f-repo').value); });
+  });
+  $('f-path').addEventListener('input', function () { $('f-path').dataset.touched = '1'; });
+  // Works out where entries.json sits in the repo from this page's own address.
+  // username.github.io repos serve from the site root; other repos serve from /repo-name/.
+  function guessPath(repo) {
+    var dir = location.pathname.replace(/[^\/]*$/, '').replace(/^\/+/, '');
+    if (repo && !/\.github\.io$/i.test(repo)) dir = dir.replace(/^[^\/]+\//, '');
+    return (location.hostname.endsWith('github.io') ? dir : 'photo365/') + 'entries.json';
+  }
   $('open-settings').onclick = function () { showSetup(true); };
   $('cancel-setup').onclick = function () { showEditor(); };
   $('forget').onclick = function () {
@@ -33,7 +45,7 @@
       cloudName: $('f-cloud').value.trim(), preset: $('f-preset').value.trim(),
       owner: $('f-owner').value.trim(), repo: $('f-repo').value.trim(),
       branch: $('f-branch').value.trim() || 'main', token: $('f-token').value.trim(),
-      path: S.path
+      path: $('f-path').value.trim().replace(/^\/+/, '') || 'photo365/entries.json'
     };
     var out = $('setup-status'); out.className = 'status'; out.textContent = 'Checking GitHub…';
     fetch('https://api.github.com/repos/' + s.owner + '/' + s.repo, { headers: { Authorization: 'Bearer ' + s.token, Accept: 'application/vnd.github+json' }, cache: 'no-store' })

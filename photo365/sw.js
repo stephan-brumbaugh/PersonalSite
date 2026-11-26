@@ -1,6 +1,6 @@
 // Service worker: makes Photo365 installable, works offline for pages you've
 // already seen, and receives photos shared from the phone's share sheet.
-var VERSION = 'p365-v1';
+var VERSION = 'p365-v2';
 var SHELL = ['./', 'index.html', 'add.html', 'app.js', 'admin.js', 'common.js', 'config.js', 'p365.css', '../assets/site.css',
   'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 

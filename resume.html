@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Resume · Stephan</title>
+  <title>Resume · Stephan Brumbaugh</title>
+  <meta name="description" content="Resume of Stephan Brumbaugh, technology and engineering teacher at Piper High School.">
   <meta name="theme-color" content="#0d0d0e">
   <link rel="icon" href="photo365/icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,24 +12,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/site.css">
   <style>
-    .resume { padding: 56px 0 72px; max-width: 860px; }
-    .resume header.top { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
-    .resume h1 { margin: 0; }
-    .resume h2 { font-family: var(--sans); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-    .item { display: grid; gap: 2px 24px; margin-bottom: 22px; }
-    @media (min-width: 640px) { .item { grid-template-columns: 150px 1fr; } }
-    .item .when { color: var(--muted); font-size: .9rem; }
-    .item h3 { margin: 0; }
-    .item .org { color: var(--muted); }
+    .resume { padding-top: 48px; padding-bottom: 72px; max-width: 900px; }
+    .resume header.top { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+    .resume h1 { margin: 0; font-size: clamp(2.4rem, 6vw, 3.6rem); }
+    .resume .role { color: var(--muted); margin: 6px 0 0; }
+    .summary { font-size: 1.08rem; line-height: 1.7; color: #d6d6da; max-width: 64ch; }
+    .resume h2 { font-family: var(--sans); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 44px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .item { display: grid; gap: 2px 28px; margin-bottom: 24px; }
+    @media (min-width: 640px) { .item { grid-template-columns: 160px 1fr; } }
+    .item .when { color: var(--muted); font-size: .88rem; padding-top: 2px; }
+    .item h3 { margin: 0; font-size: 1.05rem; }
+    .item .org { color: var(--muted); font-size: .95rem; }
     .item ul { margin: 8px 0 0; padding-left: 1.1em; color: #cfcfd3; }
-    .skills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .skills span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: .9rem; color: #cfcfd3; }
+    .item li { margin-bottom: 3px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .tags span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: .88rem; color: #cfcfd3; }
+    .two { display: grid; gap: 0 40px; }
+    @media (min-width: 760px) { .two { grid-template-columns: 1fr 1fr; } }
+    .plain { list-style: none; padding: 0; margin: 0; }
+    .plain li { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; }
+    .plain li:last-child { border-bottom: 0; }
+    .plain li span:last-child { color: var(--muted); font-size: .88rem; white-space: nowrap; }
+    .refs { color: var(--muted); }
     @media print {
-      :root { --bg: #fff; --text: #111; --muted: #555; --line: #ddd; }
+      :root { --bg: #fff; --text: #111; --muted: #555; --line: #ddd; --accent: #2a4f7a; }
       .site-header, .site-footer, .no-print { display: none !important; }
-      body { background: #fff; color: #111; }
-      .item ul, .skills span { color: #222; }
+      body { background: #fff; color: #111; font-size: 12px; }
+      .summary, .item ul, .tags span { color: #222; }
       .resume { padding: 0; }
+      .resume h2 { margin-top: 22px; }
+      .item { margin-bottom: 12px; break-inside: avoid; }
     }
   </style>
 </head>
@@ -45,47 +58,126 @@
   </header>
 
   <main class="wrap resume">
-    <!-- EDIT: everything below is placeholder text -->
     <header class="top">
       <div>
-        <h1>Stephan</h1>
-        <p class="muted" style="margin:0">Your title · City, State</p>
+        <h1>Stephan Brumbaugh</h1>
+        <p class="role">Technology &amp; Engineering Teacher · Piper High School, Kansas City, KS</p>
       </div>
       <button class="btn no-print" onclick="window.print()">Save as PDF</button>
     </header>
 
-    <p class="prose">Two or three sentences summarizing your experience and what you're looking for.</p>
+    <p class="summary">
+      Certified technology and engineering teacher at Piper High School since 2013. I write curriculum,
+      coach the robotics team, advise our TSA chapter, and lead the Design Production and Aviation academy.
+      Master of Technology from Pittsburg State, with a background in graphic design.
+    </p>
 
     <h2>Experience</h2>
     <div class="item">
-      <div class="when">2022 – Present</div>
+      <div class="when">Aug 2013 – Present</div>
       <div>
-        <h3>Job title</h3>
-        <div class="org">Organization</div>
-        <ul><li>What you did and the result.</li><li>Another accomplishment.</li></ul>
+        <h3>Technology &amp; Engineering Teacher</h3>
+        <div class="org">Piper High School · Piper USD 203, Kansas City, KS</div>
+        <ul>
+          <li>Teach high school technology and engineering courses.</li>
+          <li>Write and develop curriculum for the department.</li>
+          <li>Head coach, Piper Robotics.</li>
+          <li>Chapter advisor, Piper High School TSA.</li>
+          <li>Academy lead teacher, Design Production and Aviation.</li>
+          <li>Senior class sponsor and technology committee member.</li>
+        </ul>
       </div>
     </div>
     <div class="item">
-      <div class="when">2018 – 2022</div>
+      <div class="when">Aug 2011 – May 2013</div>
       <div>
-        <h3>Job title</h3>
-        <div class="org">Organization</div>
-        <ul><li>What you did and the result.</li></ul>
+        <h3>Teaching Graduate Assistant</h3>
+        <div class="org">Pittsburg State University · Pittsburg, KS</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Jan – Mar 2011</div>
+      <div>
+        <h3>Professional Semester (Student Teaching), Technology Education</h3>
+        <div class="org">St. Mary's Colgan · Pittsburg, KS</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Aug – Dec 2007</div>
+      <div>
+        <h3>Technology Education Pre-lab</h3>
+        <div class="org">St. Mary's Jr. High · Pittsburg, KS</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Jul 2004 – 2025</div>
+      <div>
+        <h3>Tent Manager</h3>
+        <div class="org">Jake's Fireworks</div>
+        <ul><li>Managed the tent for the summer and winter seasons.</li></ul>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Jun 2003 – Jul 2013</div>
+      <div>
+        <h3>Server, Host, and Checker</h3>
+        <div class="org">Zernghast Prop Inc.</div>
       </div>
     </div>
 
     <h2>Education</h2>
     <div class="item">
-      <div class="when">Year</div>
-      <div><h3>Degree, Field</h3><div class="org">School</div></div>
+      <div class="when">2013</div>
+      <div><h3>Master of Technology</h3><div class="org">Pittsburg State University · Pittsburg, KS</div></div>
+    </div>
+    <div class="item">
+      <div class="when">2011</div>
+      <div>
+        <h3>Bachelor of Science in Education</h3>
+        <div class="org">Pittsburg State University · Pittsburg, KS</div>
+        <ul><li>Major: Technology and Engineering Education</li><li>Minor: Graphic Design</li></ul>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">2006</div>
+      <div><h3>Diploma</h3><div class="org">Frontenac High School · Frontenac, KS</div></div>
     </div>
 
     <h2>Skills</h2>
-    <div class="skills"><span>Skill</span><span>Skill</span><span>Skill</span><span>Photography</span></div>
+    <div class="two">
+      <div>
+        <h3>Teaching</h3>
+        <ul class="item" style="display:block;padding-left:1.1em;color:#cfcfd3;margin:8px 0 20px">
+          <li>Certified in High School Technology and Engineering Education</li>
+          <li>Curriculum planning and development from a range of resources</li>
+          <li>Differentiated lessons for different learning styles</li>
+          <li>Hands-on, active learning with varied teaching aids and strategies</li>
+          <li>Using AI in the classroom</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Software (Windows and Mac)</h3>
+        <div class="tags">
+          <span>Adobe Creative Cloud</span><span>Autodesk</span><span>Corel Suite</span>
+          <span>Final Cut Studio</span><span>Windows</span><span>macOS</span>
+        </div>
+      </div>
+    </div>
+
+    <h2>Professional Affiliations</h2>
+    <ul class="plain">
+      <li><span>FIRST Robotics</span><span>2014 – Present</span></li>
+      <li><span>Kansas National Education Association</span><span>2011, 2013 – Present</span></li>
+      <li><span>International Technology and Engineering Educators Association</span><span>2006 – 2015</span></li>
+      <li><span>Tau Kappa Epsilon</span><span>2008 – 2011</span></li>
+    </ul>
+
+    <h2>References</h2>
+    <p class="refs">Available on request.</p>
   </main>
 
   <footer class="site-footer">
-    <div class="wrap"><span>Stephan</span><a href="./">Home</a></div>
+    <div class="wrap"><span>Stephan Brumbaugh</span><a href="./">Home</a></div>
   </footer>
 </body>
 </html>
