@@ -13,13 +13,13 @@ window.P365_CONFIG = {
   days: 365,
 
   // Your Cloudinary "cloud name" (Cloudinary dashboard, top left).
-  cloudName: "YOUR_CLOUD_NAME",
+  cloudName: "jbzr5cdk",
 
   // The GitHub repo this site lives in. The upload page saves captions
   // and posts to entries.json in this repo.
   github: {
-    owner: "YOUR_GITHUB_USERNAME",
-    repo: "YOUR_GITHUB_USERNAME.github.io",
+    owner: "stephan-brumbaugh",
+    repo: "stephan-brumbaugh.github.io",
     branch: "main",
     path: "photo365/entries.json"
   }
