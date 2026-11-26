@@ -44,9 +44,16 @@
     var s = {
       cloudName: $('f-cloud').value.trim(), preset: $('f-preset').value.trim(),
       owner: $('f-owner').value.trim(), repo: $('f-repo').value.trim(),
-      branch: $('f-branch').value.trim() || 'main', token: $('f-token').value.trim(),
+      branch: $('f-branch').value.trim() || 'main',
+      // Drop spaces, line breaks and invisible characters that sneak in when copying the token
+      token: $('f-token').value.replace(/[^\x21-\x7e]/g, ''),
       path: $('f-path').value.trim().replace(/^\/+/, '') || 'photo365/entries.json'
     };
+    // Accept a pasted GitHub link like https://github.com/name/repo in either box
+    var link = (s.owner + ' ' + s.repo).match(/github\.com\/([^\/\s]+)\/([^\/\s#?]+)/i);
+    if (link) { s.owner = link[1]; s.repo = link[2].replace(/\.git$/, ''); }
+    s.owner = s.owner.replace(/^@/, ''); s.repo = s.repo.replace(/^.*\//, '');
+    $('f-owner').value = s.owner; $('f-repo').value = s.repo; $('f-token').value = s.token;
     var out = $('setup-status'); out.className = 'status'; out.textContent = 'Checking GitHub…';
     fetch('https://api.github.com/repos/' + s.owner + '/' + s.repo, { headers: { Authorization: 'Bearer ' + s.token, Accept: 'application/vnd.github+json' }, cache: 'no-store' })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
@@ -57,7 +64,7 @@
         out.className = 'status ok'; out.textContent = 'Connected. Saved on this device.';
         setTimeout(showEditor, 500);
       })
-      .catch(function (e) { out.className = 'status err'; out.textContent = e.message; });
+      .catch(function (e) { out.className = 'status err'; out.textContent = P.explain(e); });
   };
 
   // ───────────── Editor ─────────────
@@ -68,7 +75,7 @@
       setEntries(r.data.entries); setStatus('');
       loadDate(params.get('date') || P.todayKey());
     }).catch(function (e) {
-      setStatus('Couldn’t reach GitHub: ' + e.message + '. Check Settings.', 'err');
+      setStatus(P.explain(e), 'err');
       loadDate(params.get('date') || P.todayKey());
     });
     if (params.get('shared')) receiveShared();
@@ -102,7 +109,65 @@
       if (cur) showPreview(P.imgUrl(cur, 'gallery'), 'Current photo. Tap to replace it.');
       else clearPreview();
     }
+    prepareShare();
   }
+
+  // ───────────── Share to Instagram / Facebook ─────────────
+  // Copies the caption, then hands the photo to the phone's share menu.
+  // The photo is fetched ahead of time because phones only allow the share
+  // menu to open straight from a tap.
+  var justUploaded = null, shareFile = null, shareFor = null;
+  function shareText(k) {
+    var list = entries.length ? entries : [{ date: k }];
+    var tag = P.isPractice(k, list) ? 'Practice shot' : 'Day ' + P.dayNumber(k, list) + ' of ' + (P.cfg.days || 365);
+    return ((cur && cur.caption) ? cur.caption + '\n\n' : '') + tag + ' #photo365';
+  }
+  function prepareShare() {
+    var k = $('date').value;
+    $('share-panel').hidden = !cur;
+    if (!cur) return;
+    $('share-text').value = shareText(k);
+    $('share-status').textContent = ''; $('share-status').className = 'status';
+    if (shareFor === k && shareFile) return;
+    shareFor = k; shareFile = null;
+    var name = 'photo365-' + k + '.jpg';
+    if (justUploaded && justUploaded.date === k) { shareFile = new File([justUploaded.blob], name, { type: 'image/jpeg' }); return; }
+    fetch(P.imgUrl(cur, 'share')).then(function (r) { if (!r.ok) throw new Error(); return r.blob(); })
+      .then(function (b) { if (shareFor === k) shareFile = new File([b], name, { type: b.type || 'image/jpeg' }); })
+      .catch(function () {});
+  }
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } finally { ta.remove(); }
+    return Promise.resolve();
+  }
+  $('share-btn').onclick = function () {
+    var out = $('share-status'), text = $('share-text').value;
+    if (!shareFile) { out.className = 'status'; out.textContent = 'Still getting the photo ready. Try again in a second.'; return; }
+    var copied = copyText(text).then(function () { return true; }, function () { return false; });
+    var data = { files: [shareFile] };
+    if (navigator.canShare && navigator.canShare(data)) {
+      navigator.share(data).then(function () {
+        copied.then(function (ok) { out.className = 'status ok'; out.textContent = ok ? 'Caption copied. In Instagram, long-press the caption box and Paste.' : 'Shared. Copy the caption from the box above if you need it.'; });
+      }).catch(function (e) {
+        if (e && e.name === 'AbortError') { out.className = 'status'; out.textContent = 'Share cancelled. The caption is still copied.'; return; }
+        saveInstead();
+      });
+    } else saveInstead();
+    function saveInstead() {
+      // Computers and older browsers can't share files: save the photo instead
+      var a = document.createElement('a'); a.href = URL.createObjectURL(shareFile); a.download = shareFile.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      copied.then(function (ok) {
+        out.className = 'status ok';
+        out.textContent = 'This browser can’t open the share menu, so the photo was saved to your downloads' + (ok ? ' and the caption was copied.' : '.') + ' Post it from the Instagram app.';
+      });
+    }
+  };
+  $('share-copy').onclick = function () {
+    copyText($('share-text').value).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Caption copied.'; });
+  };
   $('date').addEventListener('change', function () {
     if (!$('date').value) return;
     history.replaceState(null, '', '?date=' + $('date').value);
@@ -229,7 +294,7 @@
     var n = P.dayLabel(k, entries.length ? entries : [{ date: k }]).toLowerCase();
 
     var photo = file
-      ? (setStatus('Preparing photo…'), prepared.then(function (r) { setStatus('Uploading photo…'); return upload(r.blob, k); }))
+      ? (setStatus('Preparing photo…'), prepared.then(function (r) { setStatus('Uploading photo…'); justUploaded = { date: k, blob: r.blob }; return upload(r.blob, k); }))
       : Promise.resolve(null);
 
     photo.then(function (up) {
@@ -248,12 +313,13 @@
       setBar(100);
       try { localStorage.removeItem(draftKey(k)); } catch (e) {}
       file = null; prepared = null; $('file').value = '';
-      setEntries(data.entries); loadDate(k);
+      shareFor = null; setEntries(data.entries); loadDate(k);
+      $('share-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
       setStatus((n === 'practice' ? 'Published practice shot. It won’t count toward the 365.' : 'Published ' + n + '.') + ' The public site updates in about a minute.', 'ok');
       setTimeout(function () { setBar(null); }, 800);
     }).catch(function (e) {
       setBar(null);
-      setStatus(e.message + (e.status === 401 ? ' Your GitHub token may have expired; update it in Settings.' : ''), 'err');
+      setStatus(P.explain(e) + (e.status === 401 ? ' Your GitHub token may have expired; update it in Settings.' : ''), 'err');
     }).then(function () { busy = false; $('publish').disabled = false; });
   };
 
@@ -266,7 +332,7 @@
     }, 'Remove Photo365 entry ' + k, S).then(function (data) {
       try { localStorage.removeItem(draftKey(k)); } catch (e) {}
       setEntries(data.entries); loadDate(k); setStatus('Removed.', 'ok');
-    }).catch(function (e) { setStatus(e.message, 'err'); }).then(function () { busy = false; });
+    }).catch(function (e) { setStatus(P.explain(e), 'err'); }).then(function () { busy = false; });
   };
 
   window.addEventListener('beforeunload', function (e) { if (busy) { e.preventDefault(); e.returnValue = ''; } });

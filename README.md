@@ -112,6 +112,18 @@ Other things you can do:
 
 On your phone only, the Photo365 page also shows a **+** button and empty days you can tap to fill in. Visitors never see those.
 
+## Sharing to Instagram and Facebook
+
+Once a day has a photo, the app shows a **Share to Instagram or Facebook** box under it. It appears right after you publish, and whenever you open a past day in the app.
+
+1. Edit the text in the box if you want. It starts as your caption plus the day number and `#photo365`.
+2. Tap **Copy caption & share photo**. The caption is copied, and your phone's share menu opens with the photo.
+3. Pick **Instagram** (Feed or Stories). When you get to the caption, long-press the box and tap **Paste**.
+
+**To post to Facebook at the same time:** in Instagram, turn on **Share to Facebook** on the final screen before posting. That switch only appears once your Instagram and Facebook are linked in **Accounts Center** (Instagram → Settings → Accounts Center).
+
+On a computer, the browser can't open a share menu, so the button saves the photo to your downloads and copies the caption instead.
+
 ## Practice before Day 1
 
 Until January 1, 2027, everything you post is labeled **Practice**:

@@ -20,12 +20,17 @@
     var s = {};
     try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') || {}; } catch (e) {}
     var gh = CFG.github || {};
+    var owner = String(s.owner || gh.owner || '').trim(), repo = String(s.repo || gh.repo || '').trim();
+    // Accept a full GitHub link (https://github.com/name/repo) in either setting
+    var link = (owner + ' ' + repo).match(/github\.com\/([^\/\s]+)\/([^\/\s#?]+)/i);
+    if (link) { owner = link[1]; repo = link[2].replace(/\.git$/, ''); }
+    repo = repo.replace(/^.*\//, '');
     return {
       cloudName: s.cloudName || CFG.cloudName || '',
       preset: s.preset || '',
       token: s.token || '',
-      owner: s.owner || gh.owner || '',
-      repo: s.repo || gh.repo || '',
+      owner: owner.replace(/^@/, ''),
+      repo: repo,
       branch: s.branch || gh.branch || 'main',
       path: s.path || gh.path || 'photo365/entries.json'
     };
@@ -38,7 +43,8 @@
     grid: 'c_fill,g_auto,w_200,h_200,f_auto,q_auto',
     thumb: 'c_fill,g_auto,w_360,h_360,f_auto,q_auto',
     gallery: 'c_limit,w_900,f_auto,q_auto',
-    full: 'c_limit,w_2000,h_2000,f_auto,q_auto'
+    full: 'c_limit,w_2000,h_2000,f_auto,q_auto',
+    share: 'c_limit,w_2160,h_2160,f_jpg,q_90'
   };
   function imgUrl(e, size) {
     if (e.url) return new URL(e.url, scriptSrc).href; // direct URL fallback
@@ -121,9 +127,21 @@
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     return new TextDecoder().decode(bytes);
   }
+  // Plain-language version of an error. "Failed to fetch" / "Load failed" means the
+  // request never got an answer, so something between the browser and the server blocked it.
+  function explain(e) {
+    var m = (e && e.message) || String(e);
+    if (e instanceof TypeError && /fetch|load failed|network/i.test(m)) {
+      return 'Couldn’t reach GitHub from this browser, so nothing was checked yet. Usually a school or work network filter, ' +
+        'a browser extension (ad or privacy blocker), or a lost connection is blocking api.github.com. ' +
+        'Try a different network (home Wi-Fi or your phone’s data) or a private/incognito window.';
+    }
+    if (/ISO-8859-1|headers/i.test(m)) return 'The token has a character in it that isn’t allowed. Copy it again from GitHub and paste it fresh.';
+    return m;
+  }
   function gh(s, url, opts) {
     opts = opts || {};
-    opts.headers = Object.assign({ 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + s.token, 'X-GitHub-Api-Version': '2022-11-28' }, opts.headers || {});
+    opts.headers = Object.assign({ 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + s.token }, opts.headers || {});
     opts.cache = 'no-store';
     return fetch('https://api.github.com/repos/' + s.owner + '/' + s.repo + url, opts).then(function (r) {
       if (r.ok) return r.json();
@@ -191,6 +209,6 @@
     cfg: CFG, toKey: toKey, fromKey: fromKey, todayKey: todayKey, addDays: addDays, diffDays: diffDays, prettyDate: prettyDate,
     getSettings: getSettings, saveSettings: saveSettings, isAdmin: isAdmin,
     imgUrl: imgUrl, startKey: startKey, dayNumber: dayNumber, isPractice: isPractice, dayLabel: dayLabel, stats: stats,
-    esc: esc, markdown: markdown, ghRead: ghRead, ghUpdate: ghUpdate, loadEntries: loadEntries
+    esc: esc, explain: explain, markdown: markdown, ghRead: ghRead, ghUpdate: ghUpdate, loadEntries: loadEntries
   };
 })();

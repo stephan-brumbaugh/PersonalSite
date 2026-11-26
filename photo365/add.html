@@ -90,6 +90,19 @@
         </div>
       </div>
 
+      <div class="panel" id="share-panel" hidden>
+        <h3 style="margin:0 0 4px">Share to Instagram or Facebook</h3>
+        <p class="lbl" style="margin:0 0 12px">Copies this caption and opens your phone's share menu with the photo. Pick Instagram, then paste the caption.</p>
+        <textarea class="input" id="share-text" style="min-height:110px" aria-label="Caption to share"></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn primary" type="button" id="share-btn" style="flex:1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+            Copy caption &amp; share photo</button>
+          <button class="btn ghost" type="button" id="share-copy">Copy caption only</button>
+        </div>
+        <p class="status" id="share-status" role="status"></p>
+      </div>
+
       <div class="panel" id="catchup" hidden>
         <p class="lbl" style="margin:0 0 10px">Missed days. Tap to fill one in.</p>
         <div class="chips" id="missed"></div>
