@@ -19,7 +19,7 @@ window.P365_CONFIG = {
   // and posts to entries.json in this repo.
   github: {
     owner: "stephan-brumbaugh",
-    repo: "stephan-brumbaugh.github.io",
+    repo: "https://github.com/stephan-brumbaugh/PersonalSite",
     branch: "main",
     path: "photo365/entries.json"
   }
