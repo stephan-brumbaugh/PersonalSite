@@ -13,7 +13,7 @@ window.P365_CONFIG = {
   days: 365,
 
   // Your Cloudinary "cloud name" (Cloudinary dashboard, top left).
-  cloudName: "lq3dxpot",
+  cloudName: "lq3xdpot",
 
   // The GitHub repo this site lives in. The upload page saves captions
   // and posts to entries.json in this repo.
