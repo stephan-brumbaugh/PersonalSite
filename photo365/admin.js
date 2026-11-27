@@ -117,19 +117,26 @@
   // The photo is fetched ahead of time because phones only allow the share
   // menu to open straight from a tap.
   var justUploaded = null, shareFile = null, shareFor = null, dayPageWrittenAt = {};
+  // One caption for Instagram, which also goes to Facebook when Instagram's
+  // auto-share is on: caption, the blog post, a link to the full post, day tag.
+  // Instagram allows 2,200 characters, so a long post is shortened.
   function shareText(k) {
     var list = entries.length ? entries : [{ date: k }];
-    var tag = P.isPractice(k, list) ? 'Practice shot' : 'Day ' + P.dayNumber(k, list) + ' of ' + (P.cfg.days || 365);
-    return ((cur && cur.caption) ? cur.caption + '\n\n' : '') + tag + ' #photo365';
+    var tag = (P.isPractice(k, list) ? 'Practice shot' : 'Day ' + P.dayNumber(k, list) + ' of ' + (P.cfg.days || 365)) + ' #photo365';
+    var link = cur && cur.post ? 'Full post: ' + dayUrl(k) : 'More: ' + dayUrl(k);
+    var head = cur && cur.caption ? cur.caption : '';
+    var body = cur ? plain(cur.post) : '';
+    var room = 2150 - head.length - link.length - tag.length;
+    if (body.length > room) body = body.slice(0, Math.max(0, room - 1)).replace(/\s+\S*$/, '') + '…';
+    return [head, body, link, tag].filter(Boolean).join('\n\n');
   }
   function prepareShare() {
     var k = $('date').value;
     $('share-panel').hidden = !cur;
     if (!cur) return;
     $('share-text').value = shareText(k);
-    $('fb-text').value = fbText();
     $('share-status').textContent = ''; $('share-status').className = 'status';
-    if (fb.k !== k || !fb.ready) { fbSet('Checking link…', false); checkFbLink(k, dayPageWrittenAt[k]); }
+    ensureDayPage(k);
     if (shareFor === k && shareFile) return;
     shareFor = k; shareFile = null;
     var name = 'photo365-' + k + '.jpg';
@@ -151,7 +158,7 @@
     var data = { files: [shareFile] };
     if (navigator.canShare && navigator.canShare(data)) {
       navigator.share(data).then(function () {
-        copied.then(function (ok) { out.className = 'status ok'; out.textContent = ok ? 'Caption copied. In Instagram, long-press the caption box and Paste.' : 'Shared. Copy the caption from the box above if you need it.'; });
+        copied.then(function (ok) { out.className = 'status ok'; out.textContent = ok ? 'Caption copied. In Instagram, long-press the caption box, Paste, and post. With auto-share on, it goes to Facebook too.' : 'Shared. Copy the caption from the box above if you need it.'; });
       }).catch(function (e) {
         if (e && e.name === 'AbortError') { out.className = 'status'; out.textContent = 'Share cancelled. The caption is still copied.'; return; }
         saveInstead();
@@ -166,6 +173,9 @@
         out.textContent = 'This browser can’t open the share menu, so the photo was saved to your downloads' + (ok ? ' and the caption was copied.' : '.') + ' Post it from the Instagram app.';
       });
     }
+  };
+  $('share-link').onclick = function () {
+    copyText(dayUrl($('date').value)).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Link copied.'; });
   };
   $('share-copy').onclick = function () {
     copyText($('share-text').value).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Caption copied.'; });
@@ -214,61 +224,18 @@
     return P.ghPutFile(S, dayRepoPath(e.date), dayPageHtml(e, entries), 'Share page for Photo365 ' + e.date);
   }
 
-  // ───────────── Share to Facebook (link back to the post) ─────────────
-  var fb = { k: null, ready: false, timer: null };
-  function fbText() {
-    if (!cur) return '';
-    return [cur.caption || '', plain(cur.post)].filter(Boolean).join('\n\n');
-  }
-  function fbSet(label, ready) { fb.ready = ready; $('fb-btn').lastChild.textContent = ' ' + label; $('fb-btn').classList.toggle('waiting', !ready); }
-  function checkFbLink(k, written) {
-    clearTimeout(fb.timer);
-    fb.k = k;
+  // Every shared day needs its page online so the link in the caption works.
+  // Published days get one automatically; older days get one the first time
+  // they're opened here. Quietly, in the background.
+  var dayPageChecked = {};
+  function ensureDayPage(k) {
+    if (dayPageChecked[k] || dayPageWrittenAt[k] || !cur) return;
+    dayPageChecked[k] = true;
+    var e = cur;
     fetch(dayUrl(k) + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) {
-      if (fb.k !== k) return;
-      if (r.ok) { fbSet('Share to Facebook', true); return; }
-      if (!written) {
-        // An older entry without a share page yet: make one now
-        fbSet('Getting the link ready…', false);
-        return writeDayPage(cur).then(function () { dayPageWrittenAt[k] = Date.now(); checkFbLink(k, dayPageWrittenAt[k]); }, function (e) {
-          fbSet('Share to Facebook', false);
-          $('share-status').className = 'status err';
-          $('share-status').textContent = 'Couldn’t make the share link: ' + P.explain(e);
-        });
-      }
-      fbSet('Link going live… (about a minute)', false);
-      if (Date.now() - written < 5 * 60000) fb.timer = setTimeout(function () { checkFbLink(k, written); }, 8000);
-      else fbSet('Link not live yet. Try again later.', false);
-    }).catch(function () { if (fb.k === k) fbSet('Share to Facebook', true); });
+      if (r.status === 404) return writeDayPage(e).then(function () { dayPageWrittenAt[k] = Date.now(); });
+    }).catch(function () { dayPageChecked[k] = false; });
   }
-  $('fb-btn').onclick = function () {
-    var k = $('date').value, out = $('share-status');
-    if (!cur) return;
-    if (!fb.ready) { out.className = 'status'; out.textContent = 'GitHub is still publishing the page for this post. The button turns on when the link works.'; return; }
-    var url = dayUrl(k), text = $('fb-text').value;
-    var copied = text ? copyText(text).then(function () { return true; }, function () { return false; }) : Promise.resolve(false);
-    var done = function () {
-      copied.then(function (ok) {
-        out.className = 'status ok';
-        out.textContent = ok ? 'Your text is copied. In Facebook, tap where it says to write something and Paste. The link preview is added for you.' : 'Opened Facebook with the link.';
-      });
-    };
-    var touch = window.matchMedia && matchMedia('(pointer: coarse)').matches;
-    if (touch && navigator.share) {
-      // Phone: share sheet → pick Facebook
-      navigator.share({ url: url }).then(done).catch(function (e) {
-        if (e && e.name === 'AbortError') { out.className = 'status'; out.textContent = 'Share cancelled.'; return; }
-        openSharer();
-      });
-    } else openSharer();
-    function openSharer() {
-      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), 'fbshare', 'width=640,height=640');
-      done();
-    }
-  };
-  $('fb-copy-link').onclick = function () {
-    copyText(dayUrl($('date').value)).then(function () { $('share-status').className = 'status ok'; $('share-status').textContent = 'Link copied.'; });
-  };
   $('date').addEventListener('change', function () {
     if (!$('date').value) return;
     history.replaceState(null, '', '?date=' + $('date').value);
@@ -414,7 +381,7 @@
       setBar(100);
       try { localStorage.removeItem(draftKey(k)); } catch (e) {}
       file = null; prepared = null; $('file').value = '';
-      shareFor = null; fb.k = null; setEntries(data.entries);
+      shareFor = null; setEntries(data.entries);
       dayPageWrittenAt[k] = Date.now();
       writeDayPage(byDate[k]).catch(function () { delete dayPageWrittenAt[k]; });
       loadDate(k);

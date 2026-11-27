@@ -114,27 +114,23 @@ On your phone only, the Photo365 page also shows a **+** button and empty days y
 
 ## Sharing to Instagram and Facebook
 
-Once a day has a photo, the app shows a sharing box under it. It appears right after you publish, and whenever you open a past day in the app.
+Facebook doesn't let any app post to a personal profile, or fill in the text for you. The simplest setup is to post to Instagram and let Instagram copy it to Facebook.
 
-1. Edit the text in the box if you want. It starts as your caption plus the day number and `#photo365`.
-2. Tap **Share to Instagram**. The caption is copied, and your phone's share menu opens with the photo.
-3. Pick **Instagram** (Feed or Stories). When you get to the caption, long-press the box and tap **Paste**.
+**One-time setup:** in Instagram, go to **Settings → Accounts Center → Sharing across profiles**, pick your Instagram account, and turn on **Automatically share** to your Facebook profile for posts. Every Instagram post then appears on your Facebook with the same photo and caption. Instagram's menu names change sometimes; look for "sharing across profiles" or "share to Facebook".
 
-On a computer, the browser can't open a share menu, so the button saves the photo to your downloads and copies the caption instead.
+**Each time you publish:**
 
-### Facebook post with a link back to your site
+1. The **Share** box appears under the photo. Its caption already has your caption, your blog post, a link to the full post on your site, and the day tag. Edit it if you like.
+2. Tap **Share to Instagram**. The caption is copied, and your share menu opens with the photo.
+3. Pick Instagram, long-press the caption box, tap **Paste**, and post. It shows up on Facebook too.
 
-The same box has a **Facebook post with a link** section, made for blog posts:
+Instagram captions are limited to 2,200 characters, so a long post is shortened in the caption. The link takes people to the full post. Links aren't clickable on Instagram itself, but on Facebook they usually are.
 
-1. The text starts as your caption plus your post, without the formatting symbols. Edit it if you like.
-2. Tap **Share to Facebook**. The text is copied, and Facebook opens with a link to that day's post. On a phone, pick Facebook from the share menu.
-3. In Facebook, paste the text above the link and post. Facebook shows the photo and caption as a preview, and tapping it opens the post on your site.
+**Copy caption** and **Copy link** copy just those, for posting somewhere else.
 
-The link goes to a small page the app makes for each day, `photo365/day/DATE.html`, which forwards visitors to that day on the site. GitHub needs about a minute to put a new page online, so right after publishing the button says **Link going live…** and turns on by itself once the link works. Removing an entry removes its page too.
+On a computer there's no share menu, so the button saves the photo to your downloads and copies the caption instead.
 
-If you edit a day after sharing it, Facebook may keep showing the old preview. To refresh it, paste the link into Facebook's Sharing Debugger (developers.facebook.com/tools/debug) and click **Scrape Again**.
-
-You can also still post the photo itself to Facebook through Instagram: turn on **Share to Facebook** on Instagram's last screen. That switch appears once your accounts are linked in Instagram's **Accounts Center**.
+Behind the scenes, each published day gets a small page at `photo365/day/DATE.html`. That's the address the link uses. It forwards visitors to that day on the site, and it shows a photo preview when someone pastes the link into Facebook or a text message. It's removed if you remove the day.
 
 ## Practice before Day 1
 
